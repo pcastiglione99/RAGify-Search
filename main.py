@@ -1,23 +1,44 @@
 from langchain_core.vectorstores import InMemoryVectorStore
-import nest_asyncio
-nest_asyncio.apply()
+
 from googlesearch import search
-from langchain_community.document_loaders import WebBaseLoader
+
+from langchain_community.document_loaders import DirectoryLoader
+
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from langchain.schema.document import Document
+
 from langchain_ollama import OllamaEmbeddings
 
 from langchain.prompts import ChatPromptTemplate
 
 from langchain_ollama.chat_models import ChatOllama
 
+import requests
+from bs4 import BeautifulSoup
+import base64
+import re
+
 QUERY="what is retrieval augmented generation"
 
-def load_web_pages(QUERY: str):
-    results = [ str(res) for res in search(QUERY) ]
-    loader = WebBaseLoader(results)
-    return loader.aload()
+def fetch_web_pages(QUERY: str):
+    results = search(QUERY, 
+                    lang="en", 
+                    region="us")
+
+    for result in list(results):
+        with requests.get(result) as r:
+            soup = BeautifulSoup(r.text, "html.parser")
+            text = soup.find("body").get_text()
+            text = re.sub(r'[^A-Za-z0-9 ]+', '', text)
+            local_filename = base64.b64encode(result.encode("utf-8")).decode()
+            with open(f"./downloaded/{local_filename}", "w") as f:
+                f.write(text)
+
+def load_documents():
+    loader = DirectoryLoader("./downloaded")
+    documents = loader.load()
+    return documents
 
 def split_documents(documents: list[Document]):
     text_splitter = RecursiveCharacterTextSplitter(
@@ -46,7 +67,8 @@ def add_to_db(chunks: list[Document], embedding_function):
 
 def query_RAG(QUERY: str):
 
-    web_pages = load_web_pages(QUERY)
+    fetch_web_pages(QUERY)
+    web_pages = load_documents()
     chunks = split_documents(documents = web_pages)
     db = add_to_db(chunks = chunks, embedding_function=get_embedding_function())
     results= db.similarity_search_with_score(QUERY, k=5)
@@ -70,7 +92,7 @@ def query_RAG(QUERY: str):
     model = ChatOllama(model="llama3.2")
     response_text = model.invoke(prompt)
 
-    sources = [doc.metadata.get("source", "Unknown") for doc, _score in results]
+    sources = [base64.b64decode(doc.metadata.get("source", "Unknown")[11:]).decode() for doc, _score in results]
     formatted_response = f"Response: {response_text}\nSources: {sources}"
 
     print(formatted_response)
