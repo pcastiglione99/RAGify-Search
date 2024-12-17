@@ -14,6 +14,9 @@ from langchain.prompts import ChatPromptTemplate
 
 from langchain_ollama.chat_models import ChatOllama
 
+import argparse
+import os
+
 import requests
 from bs4 import BeautifulSoup
 import base64
@@ -26,11 +29,14 @@ def fetch_web_pages(QUERY: str):
                     lang="en", 
                     region="us")
 
+
     for result in list(results):
         with requests.get(result) as r:
             soup = BeautifulSoup(r.text, "html.parser")
             text = soup.find("body").get_text()
-            text = re.sub(r'[^A-Za-z0-9 ]+', '', text)
+            text = re.sub(r'\n\s*\n', '\n\n', text)
+            text = re.sub(r'\t\s*\t', '\t\t', text)
+            #text = re.sub(r'[^A-Za-z0-9 ]+', '', text)
             local_filename = base64.b64encode(result.encode("utf-8")).decode()
             with open(f"./downloaded/{local_filename}", "w") as f:
                 f.write(text)
@@ -98,5 +104,20 @@ def query_RAG(QUERY: str):
     print(formatted_response)
 
 
+def remove_temp_files():
+    for filename in os.listdir("./downloaded"):
+        file_path = os.path.join("./downloaded", filename)
+        os.remove(file_path) 
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("query_text", type=str, help="The query text.")
+    args = parser.parse_args()
+    query_text = args.query_text
+    query_RAG(query_text)
+    remove_temp_files()
+
+
 if __name__ == "__main__":
-    query_RAG(QUERY)
+    main()
+    remove_temp_files()
