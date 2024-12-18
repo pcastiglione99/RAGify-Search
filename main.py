@@ -22,8 +22,6 @@ from bs4 import BeautifulSoup
 import base64
 import re
 
-QUERY="what is retrieval augmented generation"
-
 def fetch_web_pages(QUERY: str):
     results = search(QUERY, 
                     lang="en", 
@@ -71,13 +69,13 @@ def add_to_db(chunks: list[Document], embedding_function):
 
 
 
-def query_RAG(QUERY: str):
+def query_RAG(QUERY: str) -> str:
 
     fetch_web_pages(QUERY)
     web_pages = load_documents()
     chunks = split_documents(documents = web_pages)
     db = add_to_db(chunks = chunks, embedding_function=get_embedding_function())
-    results= db.similarity_search_with_score(QUERY, k=5)
+    results= db.similarity_search_with_score(QUERY, k=3)
 
     PROMPT_TEMPLATE = """
     Answer the question based only on the following context:
@@ -86,7 +84,8 @@ def query_RAG(QUERY: str):
 
     ---
 
-    Answer the question based on the above context: {question}
+    Answer the question based on the above context. Write at least 5 lines. Do
+    not write "according to the context", just write the answer: {question}
     """
 
     context_text = "\n\n---\n\n".join([doc.page_content for doc, _score in results])
@@ -99,25 +98,22 @@ def query_RAG(QUERY: str):
     response_text = model.invoke(prompt)
 
     sources = [base64.b64decode(doc.metadata.get("source", "Unknown")[11:]).decode() for doc, _score in results]
-    formatted_response = f"Response: {response_text}\nSources: {sources}"
-
-    print(formatted_response)
+    formatted_response = f"{response_text.content}\nSources: {sources}"
+    return formatted_response
 
 
 def remove_temp_files():
     for filename in os.listdir("./downloaded"):
+        print(filename)
         file_path = os.path.join("./downloaded", filename)
         os.remove(file_path) 
 
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("query_text", type=str, help="The query text.")
-    args = parser.parse_args()
-    query_text = args.query_text
-    query_RAG(query_text)
+def main(query_text):
+    #parser = argparse.ArgumentParser()
+    #parser.add_argument("query_text", type=str, help="The query text.")
+    #args = parser.parse_args()
+    #query_text = args.query_text
+    response = query_RAG(query_text)
     remove_temp_files()
+    return response
 
-
-if __name__ == "__main__":
-    main()
-    remove_temp_files()
