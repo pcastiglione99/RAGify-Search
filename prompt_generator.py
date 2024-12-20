@@ -21,7 +21,7 @@ def generate_prompt(query: str, embedding_function):
     documents = load_documents()
     chunks = split_documents(documents)
     db = add_to_db(chunks, embedding_function)
-    results = db.similarity_search_with_score(query, k=3)
+    results = db.similarity_search_with_score(query, k=5)
 
     context_text = "\n\n---\n\n".join([doc.page_content for doc, _ in results])
 

@@ -24,7 +24,7 @@ if usr_msg := st.chat_input():
     st.session_state.messages.append({"role": "user", "content": usr_msg})
     st.chat_message("user").write(usr_msg)
 
-    with st.chat_message("assistant", avatar="🤖"):
+    with st.chat_message("assistant"):
         with st.spinner("model working..."):
             keywords = extract_keywords(usr_msg)
             fetch_web_pages(keywords)
