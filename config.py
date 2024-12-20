@@ -1,0 +1,4 @@
+CHUNK_SIZE = 800
+CHUNK_OVERLAP = 80
+DOWNLOAD_DIR = "./downloaded"
+MODEL_NAME = "llama3.2"
