@@ -1,6 +1,7 @@
 import streamlit as st
 from langchain_ollama.chat_models import ChatOllama
-from nlp_utils import extract_keywords
+#from nlp_utils import extract_keywords
+from extract_keywords import extract_keywords
 from web_scraper import fetch_web_pages, remove_temp_files
 from db_operations import get_embedding_function
 from prompt_generator import generate_prompt
@@ -25,12 +26,15 @@ if usr_msg := st.chat_input():
     st.chat_message("user").write(usr_msg)
 
     with st.chat_message("assistant"):
-        with st.spinner("model working..."):
+        with st.spinner("extracting keywords"):
             keywords = extract_keywords(usr_msg)
+            print(keywords)
+        with st.spinner("searching on the web"):
             fetch_web_pages(keywords)
 
             embedding_function = get_embedding_function()
             
+        with st.spinner("extract info from webpages"):
             prompt, sources = generate_prompt(usr_msg, embedding_function)
 
             llm = ChatOllama(model="llama3.2", stream=True)

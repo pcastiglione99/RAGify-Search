@@ -1,19 +1,24 @@
 import base64
 from langchain_community.document_loaders import DirectoryLoader
+from langchain_community.document_loaders.text import TextLoader
 from langchain.schema.document import Document
 from langchain.prompts import ChatPromptTemplate
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from db_operations import add_to_db
 from web_scraper import remove_temp_files
+from config import CHUNK_OVERLAP, CHUNK_SIZE
 
 def load_documents(download_dir: str = "./downloaded") -> list[Document]:
-    loader = DirectoryLoader(download_dir)
+    loader = DirectoryLoader(
+        download_dir,
+        use_multithreading=True,
+        loader_cls=TextLoader)
     return loader.load()
 
 def split_documents(documents):
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=800,
-        chunk_overlap=80
+        chunk_size=CHUNK_SIZE,
+        chunk_overlap=CHUNK_OVERLAP
     )
     return text_splitter.split_documents(documents)
 
