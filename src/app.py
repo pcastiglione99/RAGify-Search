@@ -1,3 +1,4 @@
+from re import search
 import streamlit as st
 from langchain_ollama.chat_models import ChatOllama
 from extract_keywords import extract_keywords
@@ -6,18 +7,26 @@ from db_operations import get_embedding_function
 from prompt_generator import generate_prompt
 import asyncio
 
+st.set_page_config(page_title="RAGify", page_icon="🤖")
+st.title("RAGify")
+
 
 def chunk_generator(llm, query):
     for chunk in llm.stream(query):
         yield chunk
 
-st.title("RAGify")
 
 with st.sidebar:
     llm_model = st.selectbox(label="Select llm model",
-                             options=["llama3.2","qwen2.5"]
+                             options=["llama3.2"]
                              )
-st.write(llm_model)
+    search_engine = st.selectbox(label="Select search engine",
+                             options=["google","duckduckgo"]
+                             )
+    n_results = st.number_input(label="Select number of web results",
+                                min_value=1,
+                                max_value=8,
+                                value=4)
 if "messages" not in st.session_state:
     st.session_state["messages"] = [
         {"role": "assistant", "content": "Hi, I'm a chatbot who can search the web. How can I help you?"}
@@ -34,8 +43,9 @@ if usr_msg := st.chat_input():
         with st.spinner("extracting keywords..."):
             keywords = extract_keywords(usr_msg, model=llm_model)
             print(keywords)
+
         with st.spinner("searching on the web..."):
-            asyncio.run(fetch_web_pages(keywords))
+            asyncio.run(fetch_web_pages(keywords, n_results))
 
             embedding_function = get_embedding_function()
             
