@@ -5,7 +5,7 @@ from langchain.schema.document import Document
 from langchain.prompts import ChatPromptTemplate
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from db_operations import add_to_db
-from web_scraper import remove_temp_files
+from web_scraper import decode_filename_to_url, remove_temp_files
 from config import CHUNK_OVERLAP, CHUNK_SIZE
 
 def load_documents(download_dir: str = "./downloaded") -> list[Document]:
@@ -43,7 +43,8 @@ def generate_prompt(query: str, embedding_function):
         """
     )
 
-    sources = [base64.b64decode(doc.metadata.get("source", "Unknown")[11:]).decode() for doc, _score in results]
+    #sources = [base64.b64decode(doc.metadata.get("source", "Unknown")[11:]).decode() for doc, _score in results]
+    sources = [decode_filename_to_url(doc.metadata.get("source", "Unknown"))[11:] for doc, _score in results]
     prompt = prompt_template.format(context=context_text, question=query)
 
     remove_temp_files()

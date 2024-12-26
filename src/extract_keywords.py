@@ -2,7 +2,7 @@ from langchain_ollama.chat_models import ChatOllama
 from langchain.prompts import ChatPromptTemplate
 from config import MODEL_NAME
 
-def extract_keywords(query: str) -> list[str]:
+def extract_keywords(query: str, model: str = MODEL_NAME) -> list[str]:
     system_prompt = ChatPromptTemplate.from_template('''
 You are a query generator designed to assist with web searches. Your task is to take a user query and generate one or more precise, relevant queries to be input into a web search engine. These queries should aim to retrieve the most authoritative, comprehensive, and contextually relevant web pages to answer the user's original question effectively.
 ---
@@ -30,7 +30,7 @@ Make sure the queries are diverse enough to cover different aspects of the topic
 **Output:**
     ''')
 
-    llm = ChatOllama(model=MODEL_NAME)
+    llm = ChatOllama(model=model)
     prompt = system_prompt.format(input_query=query)
 
     llm_output = llm.invoke(prompt)

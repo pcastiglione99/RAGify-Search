@@ -1,73 +1,46 @@
-'''
+import asyncio
+import aiohttp
 import os
-import re
-import base64
-import requests
-from bs4 import BeautifulSoup
+import urllib.parse
 from googlesearch import search
-
-def fetch_web_pages(queries: list[str], download_dir: str = "./downloaded"):
-    os.makedirs(download_dir, exist_ok=True)
-    for query in queries:
-        for result in search(query, lang="en", region="us"):
-            try:
-                response = requests.get(result, timeout=10)
-                response.raise_for_status()
-                soup = BeautifulSoup(response.text, "html.parser")
-                text = soup.find("body").get_text(strip=True)
-                text = re.sub(r'\s{2,}', '\n', text)
-
-                local_filename = base64.b64encode(result.encode("utf-8")).decode()
-                with open(os.path.join(download_dir, local_filename), "w", encoding="utf-8") as f:
-                    f.write(text)
-            except (requests.RequestException, AttributeError):
-                continue
-
-def remove_temp_files(download_dir: str = "./downloaded"):
-    for filename in os.listdir(download_dir):
-        file_path = os.path.join(download_dir, filename)
-        os.remove(file_path)
-
-'''
-import os
-import re
-import base64
-import requests
 from bs4 import BeautifulSoup
-from googlesearch import search
-from concurrent.futures import ThreadPoolExecutor, as_completed
 from config import REQUESTS_HEADER
 
-def fetch_and_save_page(query: str, result: str, download_dir: str):
+# Function to encode URL for filename
+def encode_url_to_filename(url):
+    return urllib.parse.quote(url, safe="") + ".html"
+
+# Function to decode filename back to URL
+def decode_filename_to_url(filename):
+    return urllib.parse.unquote(filename[:-5])  # Remove ".html" and decode
+
+# Function to fetch and save a single page
+async def fetch_and_save(session, url, folder):
     try:
-        response = requests.get(result, timeout=10, headers=REQUESTS_HEADER)
-        response.raise_for_status()
-        soup = BeautifulSoup(response.text, "html.parser")
-        text = soup.find("body").get_text(strip=True)
-        text = re.sub(r'\s{2,}', '\n', text)
+        filename = encode_url_to_filename(url)
+        filepath = os.path.join(folder, filename)
 
-        local_filename = base64.b64encode(result.encode("utf-8")).decode().replace('/','_')
-        print(local_filename)
-        file_path = os.path.join(download_dir, local_filename)
+        async with session.get(url) as response:
+            response.raise_for_status()
+            content = await response.text()
+            soup = BeautifulSoup(content, "html.parser")
+            text = soup.find("body").get_text(strip=True)
+            with open(filepath, "w", encoding="utf-8") as file:
+                file.write(text)
+            print(f"Saved: {filepath}")
+    except Exception:
+        return f"Failed to fetch or save for url: {url}"
 
-        with open(file_path, "w", encoding="utf-8") as f:
-            f.write(text)
-    except (requests.RequestException, AttributeError):
-        return f"Failed to fetch or save for query: {query}, result: {result}"
 
-def fetch_web_pages(queries: list[str], download_dir: str = "./downloaded"):
+# Function to download all pages
+async def fetch_web_pages(query, download_dir: str = "./downloaded"):
+    urls = search(query, lang="en", region="us")
+    # Ensure the folder exists
     os.makedirs(download_dir, exist_ok=True)
 
-    with ThreadPoolExecutor() as executor:
-        futures = []
-        for query in queries:
-            for result in search(query, lang="en", region="us", num_results=3):
-                futures.append(executor.submit(fetch_and_save_page, query, result, download_dir))
-        
-        for future in as_completed(futures):
-            result = future.result()
-            if result:
-                print(result)
+    async with aiohttp.ClientSession(headers=REQUESTS_HEADER) as session:
+        tasks = [fetch_and_save(session, url, download_dir) for url in urls]
+        await asyncio.gather(*tasks)
 
 def remove_temp_files(download_dir: str = "./downloaded"):
     for filename in os.listdir(download_dir):
