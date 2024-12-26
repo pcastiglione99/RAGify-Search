@@ -97,7 +97,7 @@ tqdm==4.67.1
 typing-inspect==0.9.0
 typing_extensions==4.12.2
 tzdata==2024.2
-unstructured==0.11.8
+unstructured>=0.14.3
 unstructured-client==0.28.1
 urllib3==2.3.0
 watchdog==6.0.0
