@@ -9,7 +9,6 @@ RAGify Search is an AI-powered intelligent assistant built with Streamlit, desig
 
 ## Key Features
 - **Real-Time Web Search**: Fetch relevant web pages for user queries.
-- **NLP-Based Keyword Extraction**: Leverage NLTK to identify key terms for targeted searches.
 - **Document Processing**: Split, embed, and index documents for similarity-based searches.
 - **Prompt Engineering**: Generate optimized prompts for the LLM model.
 - **Streamlit Interface**: Simple and intuitive chatbot-like user experience.
