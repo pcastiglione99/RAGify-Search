@@ -5,7 +5,7 @@ MODEL_NAME = "llama3.2"
 EMBEDDING_MODEL_NAME = "nomic-embed-text"
 REQUESTS_HEADER = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36'}
 PROMPT = '''
-You are a query generator designed to assist with web searches. Your task is to take a user query and generate one or more precise, relevant queries to be input into a web search engine. These queries should aim to retrieve the most authoritative, comprehensive, and contextually relevant web pages to answer the user's original question effectively. You are free to choose the number of generated queries based on the difficulty of the user query. Max number of output query is 4
+You are a query generator designed to assist with web searches. Your task is to take a user query and generate one or more precise, relevant queries to be input into a web search engine. These queries should aim to retrieve the most authoritative, comprehensive, and contextually relevant web pages to answer the user's original question effectively. You are free to choose the number of generated queries based on the difficulty of the user query (for a simple task 1 query is enough). Max number of output queries is 4. Sort queries based on their importance regarding the task.
 ---
 Requirements:
 
