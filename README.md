@@ -1,5 +1,7 @@
 # RAGify Search - Intelligent Assistant with Web Search RAG
 
+![RAGify](./RAGify.gif)
+
 ## Description
 RAGify Search is an AI-powered intelligent assistant built with Streamlit, designed to answer user queries by integrating real-time web search, natural language processing (NLP), and advanced embedding techniques. It uses a Retrieval-Augmented Generation (RAG) approach to provide accurate, concise, and context-aware responses
 

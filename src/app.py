@@ -1,4 +1,3 @@
-from re import search
 import streamlit as st
 from langchain_ollama.chat_models import ChatOllama
 from extract_keywords import extract_keywords
