@@ -22,8 +22,8 @@ def split_documents(documents):
     )
     return text_splitter.split_documents(documents)
 
-def generate_prompt(query: str, embedding_function):
-    documents = load_documents()
+def generate_prompt(query: str, docs: list[Document], embedding_function):
+    documents = docs#load_documents()
     chunks = split_documents(documents)
     db = add_to_db(chunks, embedding_function)
     results = db.similarity_search_with_score(query, k=5)
