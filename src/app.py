@@ -4,7 +4,6 @@ from extract_queries import extract_queries
 from web_scraper import fetch_web_pages
 from db_operations import get_embedding_function
 from prompt_generator import generate_prompt
-from web_search import web_search
 import asyncio
 
 st.set_page_config(page_title="RAGify", page_icon="🤖")
@@ -45,12 +44,12 @@ if usr_msg := st.chat_input():
             print(queries)
 
         with st.spinner("searching on the web..."):
-            docs = web_search(queries, n_results)
+            asyncio.run(fetch_web_pages(queries, n_results))
 
             embedding_function = get_embedding_function()
             
         with st.spinner("extract info from webpages..."):
-            prompt, sources = generate_prompt(usr_msg, docs ,embedding_function)
+            prompt, sources = generate_prompt(usr_msg, embedding_function)
         
 
         with st.spinner("generating response..."):

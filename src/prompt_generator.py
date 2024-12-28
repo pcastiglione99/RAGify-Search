@@ -22,8 +22,8 @@ def split_documents(documents):
     )
     return text_splitter.split_documents(documents)
 
-def generate_prompt(query: str, docs: list[Document], embedding_function):
-    documents = docs#load_documents()
+def generate_prompt(query: str, embedding_function):
+    documents = load_documents()
     chunks = split_documents(documents)
     db = add_to_db(chunks, embedding_function)
     results = db.similarity_search_with_score(query, k=5)
@@ -43,7 +43,6 @@ def generate_prompt(query: str, docs: list[Document], embedding_function):
         """
     )
 
-    #sources = [base64.b64decode(doc.metadata.get("source", "Unknown")[11:]).decode() for doc, _score in results]
     sources = [decode_filename_to_url(doc.metadata.get("source", "Unknown"))[11:] for doc, _score in results]
     prompt = prompt_template.format(context=context_text, question=query)
 
