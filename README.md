@@ -3,7 +3,7 @@
 ![RAGify](./RAGify.gif)
 
 ## Description
-RAGify Search is an AI-powered intelligent assistant built with Streamlit, designed to answer user queries by integrating real-time web search, natural language processing (NLP), and advanced embedding techniques. It uses a Retrieval-Augmented Generation (RAG) approach to provide accurate, concise, and context-aware responses
+RAGify Search is an AI-powered intelligent assistant built with Streamlit, designed to answer user queries by integrating real-time web search. It uses a Retrieval-Augmented Generation (RAG) approach to provide accurate, concise, and context-aware responses
 
 ---
 
@@ -19,12 +19,12 @@ RAGify Search is an AI-powered intelligent assistant built with Streamlit, desig
 
 ## Directory Structure
 
-- **`web_scraper.py`**: Manages web scraping and temporary file handling.
-- **`nlp_utils.py`**: Extracts keywords using advanced NLP techniques.
-- **`db_operations.py`**: Embeds and indexes document chunks for search.
-- **`prompt_generator.py`**: Prepares structured prompts for context-aware answers.
 - **`app.py`**: Front-end application powered by Streamlit.
 - **`config.py`**: Centralized configuration for chunk sizes, model names, and directories.
+- **`db_operations.py`**: Embeds and indexes document chunks for search.
+- **`extract_queries.py`**: Generates optimized queries to be searched.
+- **`web_scraper.py`**: Manages web scraping and temporary file handling.
+- **`prompt_generator.py`**: Prepares structured prompts for context-aware answers.
 
 ---
 
