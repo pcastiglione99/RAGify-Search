@@ -44,7 +44,7 @@ if usr_msg := st.chat_input():
             print(queries)
 
         with st.spinner("searching on the web..."):
-            asyncio.run(fetch_web_pages(queries, n_results))
+            asyncio.run(fetch_web_pages(queries, n_results, provider=search_engine))
 
             embedding_function = get_embedding_function()
             

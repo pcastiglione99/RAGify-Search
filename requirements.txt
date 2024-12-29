@@ -1,5 +1,6 @@
 aiohttp
 bs4
+duckduckgo-search
 googlesearch-python
 langchain
 langchain-community
