@@ -5,6 +5,7 @@ from web_scraper import fetch_web_pages
 from db_operations import get_embedding_function
 from prompt_generator import generate_prompt
 import asyncio
+import ollama
 
 st.set_page_config(page_title="RAGify", page_icon="🤖")
 st.title("RAGify")
@@ -17,7 +18,7 @@ def chunk_generator(llm, query):
 
 with st.sidebar:
     llm_model = st.selectbox(label="Select llm model",
-                             options=["llama3.2"]
+                             options=[model.model for model in ollama.list().models if model.model != "nomic-embed-text:latest"]
                              )
     search_engine = st.selectbox(label="Select search engine",
                              options=["google","duckduckgo"]
