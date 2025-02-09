@@ -32,7 +32,7 @@ def generate_prompt(query: str, embedding_function):
 
     prompt_template = ChatPromptTemplate.from_template(
         """
-        You are an intelligent assistant designed to answer user questions accurately and concisely using the following context document.
+        You are an intelligent assistant designed to answer user questions accurately and using the following context document.
         Context:
         {context}
 
