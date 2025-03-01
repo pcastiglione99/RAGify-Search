@@ -8,3 +8,4 @@ langchain-core
 langchain-ollama
 streamlit
 urllib3
+chardet
