@@ -46,6 +46,11 @@ RAGify Search is an AI-powered intelligent assistant built with Streamlit, desig
    streamlit run ./src/app.py
    ```
 
+4. **langchain ollama requirement**
+	```bash
+	ollama pull nomic-embed-text
+	```
+
 ---
 
 ## Usage

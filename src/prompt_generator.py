@@ -9,10 +9,12 @@ from web_scraper import decode_filename_to_url, remove_temp_files
 from config import CHUNK_OVERLAP, CHUNK_SIZE
 
 def load_documents(download_dir: str = "./downloaded") -> list[Document]:
+    text_loader_kwargs={'autodetect_encoding': True}
     loader = DirectoryLoader(
         download_dir,
         use_multithreading=True,
-        loader_cls=TextLoader)
+        loader_cls=TextLoader,
+        loader_kwargs=text_loader_kwargs)
     return loader.load()
 
 def split_documents(documents):
